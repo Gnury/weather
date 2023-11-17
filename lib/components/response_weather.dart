@@ -89,8 +89,8 @@ class Clouds {
 }
 
 class Coord {
-    final int lon;
-    final int lat;
+    final double lon;
+    final double lat;
 
     Coord({
         required this.lon,
@@ -119,8 +119,8 @@ class Main {
     final double tempMax;
     final int pressure;
     final int humidity;
-    final int seaLevel;
-    final int grndLevel;
+    final int? seaLevel;
+    final int? grndLevel;
 
     Main({
         required this.temp,
@@ -219,7 +219,7 @@ class Weather {
 class Wind {
     final double speed;
     final int deg;
-    final double gust;
+    final double? gust;
 
     Wind({
         required this.speed,
