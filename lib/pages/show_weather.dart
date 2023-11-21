@@ -1,13 +1,13 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:weather_report/components/api.dart';
+import 'package:weather_report/components/api_service.dart';
+import 'package:weather_report/components/location_service.dart';
 import 'package:weather_report/components/horizontal_card.dart';
+import 'package:weather_report/components/response_weather.dart';
 import 'package:weather_report/components/vertical_card.dart';
+import 'package:weather_report/models/daily_weather.dart';
 import 'package:weather_report/models/day_weather.dart';
 import 'package:weather_report/models/time_weather.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class ShowWeather extends StatefulWidget {
   const ShowWeather({super.key});
@@ -17,14 +17,11 @@ class ShowWeather extends StatefulWidget {
 }
 
 class _ShowWeatherState extends State<ShowWeather> {
-  final Api _apiService = Api();
-  final List<TimeWeather> weathers = List.generate(
-    24,
-    (index) => TimeWeather(
-      temperatureInCelsius: 20 + Random().nextInt(10),
-      dateTime: DateTime.now().add(Duration(hours: index)),
-    ),
-  );
+  final ApiService _apiService = ApiService();
+  final LocationService _locationService = LocationService();
+
+  ThisWeather? thisWeather;
+  DailyWeather? dailyWeather;
   bool isCelsius = true;
 
   final List<DayClimate> dayclimates = [
@@ -65,40 +62,61 @@ class _ShowWeatherState extends State<ShowWeather> {
     ),
   ];
 
-  TimeWeather? currentWeather;
-
   @override
   void initState() {
     super.initState();
     _getCurrentWeather();
-  }
-
-  Future<Position> _getCurrentLocation() async {
-    await Permission.location.request();
-    final Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-
-    print('position $position');
-    return position;
+    _getWeather();
   }
 
   Future<void> _getCurrentWeather() async {
-    final position = await _getCurrentLocation();
-    final weather = await _apiService.getWeather(
+    final position = await _locationService.getCurrentLocation();
+    final weathers = await _apiService.getCurrentWeather(
       latitude: position.latitude,
       longitude: position.longitude,
     );
-    print('weather $weather');
+    print('weathers $weathers');
     setState(() {
-      currentWeather = weather;
+      dailyWeather = weathers;
+    });
+  }
+
+  Future<void> _getWeather() async{
+    final position = await _locationService.getCurrentLocation();
+    final weathers = await _apiService.getForecastWeather(
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
+    print('weathers $weathers');
+    setState(() {
+      thisWeather = weathers;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final nowTemperature = currentWeather?.temperatureInCelsius;
+    final city = thisWeather?.city.toUpperCase();
+    final highTemp = dailyWeather?.highTempInCelsius;
+    final String displayedHighTemp;
+    if (highTemp != null) {
+      displayedHighTemp = isCelsius
+          ? highTemp.toString()
+          : ((highTemp * 9 / 5) + 32).toStringAsFixed(0);
+    } else {
+      displayedHighTemp = '??';
+    }
+    final lowTemp = dailyWeather?.lowTempInCelsius;
+    final String displayedLowTemp;
+    if (lowTemp != null) {
+      displayedLowTemp = isCelsius
+          ? lowTemp.toString()
+          : ((lowTemp * 9 / 5) + 32).toStringAsFixed(0);
+    } else {
+      displayedLowTemp = '??';
+    }
+    final nowTemperature = dailyWeather?.temperatureInCelsius;
     final String displayedTemperature;
+    final nowHumidity = dailyWeather?.humidity.toString();
     if (nowTemperature != null) {
       displayedTemperature = isCelsius
           ? nowTemperature.toString()
@@ -134,17 +152,18 @@ class _ShowWeatherState extends State<ShowWeather> {
                 height: 16,
               ),
 
-              const Row(
+              Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                   ),
                   Text(
-                    'CITY',
+                    '$city',
                     textAlign: TextAlign.right,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.bold,
+
                     ),
                   ),
                 ],
@@ -232,7 +251,7 @@ class _ShowWeatherState extends State<ShowWeather> {
                                 child: const Text(
                                   '°C',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.black),
+                                  style: TextStyle(color: Colors.black,),
                                 ),
                               ),
                             ),
@@ -281,20 +300,20 @@ class _ShowWeatherState extends State<ShowWeather> {
                 children: [
                   Expanded(
                     child: Container(
-                      child: const Text(
-                        'H :',
+                      child: Text(
+                        'H :   $displayedHighTemp',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 25, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   Expanded(
                     child: Container(
-                      child: const Text(
-                        'L :',
+                      child: Text(
+                        'L :   $displayedLowTemp',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 25, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -313,17 +332,17 @@ class _ShowWeatherState extends State<ShowWeather> {
                   borderRadius: BorderRadius.circular(25),
                   color: Color.fromARGB(82, 255, 255, 255),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                     ),
-                    Icon(Icons.water_drop_outlined),
+                    const Icon(Icons.water_drop_outlined),
                     Text(
-                      '   HUMIDITY',
+                      '   HUMIDITY             $nowHumidity %',
                       style:
-                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                          const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -334,7 +353,7 @@ class _ShowWeatherState extends State<ShowWeather> {
               ),
 
               HorizontalCard(
-                weathers: weathers,
+                weathers: thisWeather?.list,
               ),
 
               const SizedBox(

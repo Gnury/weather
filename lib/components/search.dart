@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:weather_report/models/city_name.dart';
 
 class SearchBar extends StatefulWidget {
   const SearchBar({super.key});
@@ -10,8 +11,8 @@ class SearchBar extends StatefulWidget {
 }
 
 class _SearchBarState extends State<SearchBar> {
-  List<String> items = List.generate(50, (index) => Random().nextInt(10).toString());
-  List<String> filteredItems = [];
+  List<CityName> items = List.from().length.toString() as List<CityName>;
+  List<CityName> filteredItems = [];
   String _query = '';
 
   void search(String query) {
@@ -21,7 +22,7 @@ class _SearchBarState extends State<SearchBar> {
 
         filteredItems = items
             .where(
-              (item) => item.toLowerCase().contains(
+              (item) => item.name.toLowerCase().contains(
                     query.toLowerCase(),
                   ),
             )
