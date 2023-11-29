@@ -5,20 +5,20 @@ final formatter = DateFormat.yMd();
 enum Climate {
   sunny,
   cloudy,
-  dayrainy,
+  dayRainy,
   thunder,
   moon,
-  nightrainy,
+  nightRainy,
   windy,
 }
 
 var climateImages = {
   Climate.sunny: 'assets/images/sunny.png',
   Climate.cloudy: 'assets/images/cloudy.png',
-  Climate.dayrainy: 'assets/images/dayrainy.png',
+  Climate.dayRainy: 'assets/images/dayrainy.png',
   Climate.thunder: 'assets/images/thunder.png',
   Climate.moon: 'assets/images/moon.png',
-  Climate.nightrainy: 'assets/images/nightrainy.png',
+  Climate.nightRainy: 'assets/images/nightrainy.png',
   Climate.windy: 'assets/images/windy.png',
 };
 
@@ -30,7 +30,7 @@ class DayClimate {
   });
 
   final DateTime date;
-  final Climate climate;
+  final Climate? climate;
   final String title;
 
   String get formattedDate {
@@ -41,11 +41,11 @@ class DayClimate {
 class DayWeather {
   DayWeather({
     required this.climate,
-    required this.dayclimates,
+    required this.dayClimates,
   });
 
-  final Climate climate;
-  final List<DayClimate> dayclimates;
+  final Climate? climate;
+  final List<DayClimate> dayClimates;
 
 //   DayWeather.forClimate(List<DayClimate> allClimates, this.climate)
 //       : climates = allClimates

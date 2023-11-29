@@ -3,6 +3,7 @@ import 'package:weather_report/components/cities.dart';
 import 'package:weather_report/components/response_forecast_weather.dart';
 import 'package:weather_report/components/response_weather.dart';
 import 'package:weather_report/models/daily_weather.dart';
+import 'package:weather_report/models/day_weather.dart';
 import 'package:weather_report/models/time_weather.dart';
 import 'package:weather_report/models/city_name.dart';
 
@@ -83,9 +84,25 @@ class ApiService {
       final list = forecastWeather.list.map((weather) {
         final temperatureInFahrenheit = weather.main.temp;
         final temperatureInCelsius = (temperatureInFahrenheit - 32) / 5 ~/ 9;
+        final firstWeather = weather.weather.firstOrNull;
+        final description = firstWeather?.description?.name;
+
+
+        final Climate? climates;
+        if(firstWeather?.main == null){
+          climates = Climate.sunny;
+        }else if(firstWeather?.main == MainEnum.CLOUDS){
+          climates = Climate.cloudy;
+        }else if(firstWeather?.main == MainEnum.RAIN){
+          climates = Climate.dayRainy;
+        }else{
+          climates = null;
+        }
         return TimeWeather(
           temperatureInCelsius: temperatureInCelsius,
           dateTime: weather.dtTxt,
+          title: description,
+          climate: climates,
         );
       }).toList();
 
@@ -99,9 +116,7 @@ class ApiService {
     }
   }
 
-  Future<CityName> getCities({
-    required String q
-  }) async {
+  Future<CityName> getCities({required String q}) async {
     try {
       final response = await dio.get(
         'http://api.openweathermap.org/geo/1.0/direct',
@@ -112,16 +127,14 @@ class ApiService {
           },
         ),
         queryParameters: {
-          'q' : q,
+          'q': q,
           'appid': '8b06f7a92d32f24e637b47f97a25ca06',
         },
       );
       var data = response.data;
 
       final cities = Cities.fromJson(data);
-      return CityName(
-      name: cities.name
-      );
+      return CityName(name: cities.name);
     } catch (error) {
       print('error = $error');
       rethrow;

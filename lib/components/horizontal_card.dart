@@ -14,10 +14,15 @@ class HorizontalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final weathers = this.weathers;
     final now = DateTime.now();
-    final futureWeathers = weathers?.where((e) => e.dateTime.isAfter(now)).toList();
-    final nowAndNextTwentyFourHoursWeathers = futureWeathers != null
-        ? futureWeathers.isNotEmpty
-            ? futureWeathers.sublist(0, 8)
+    final todayWeathers = weathers
+        ?.where((e) =>
+            e.dateTime.year == now.year &&
+            e.dateTime.month == now.month &&
+            e.dateTime.day == now.day)
+        .toList();
+    final nowAndNextTwentyFourHoursWeathers = todayWeathers != null
+        ? todayWeathers.isNotEmpty
+            ? todayWeathers
             : []
         : null;
 
@@ -41,6 +46,7 @@ class HorizontalCard extends StatelessWidget {
                   width: 110,
                   child: Column(
                     children: [
+                      // Image(image: ),
                       Text(timeLabel),
                       Text(item.temperatureInCelsius.toString()),
                     ],

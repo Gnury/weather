@@ -1,9 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:weather_report/components/api_service.dart';
 import 'package:weather_report/components/location_service.dart';
 import 'package:weather_report/components/horizontal_card.dart';
-import 'package:weather_report/components/response_weather.dart';
 import 'package:weather_report/components/vertical_card.dart';
 import 'package:weather_report/models/daily_weather.dart';
 import 'package:weather_report/models/day_weather.dart';
@@ -23,44 +21,7 @@ class _ShowWeatherState extends State<ShowWeather> {
   ThisWeather? thisWeather;
   DailyWeather? dailyWeather;
   bool isCelsius = true;
-
-  final List<DayClimate> dayclimates = [
-    DayClimate(
-      climate: Climate.cloudy,
-      title: 'Cloudy',
-      date: DateTime.now(),
-    ),
-    DayClimate(
-      climate: Climate.sunny,
-      title: 'Sunny',
-      date: DateTime.now(),
-    ),
-    DayClimate(
-      climate: Climate.dayrainy,
-      title: 'Rainy',
-      date: DateTime.now(),
-    ),
-    DayClimate(
-      climate: Climate.dayrainy,
-      title: 'Rainy',
-      date: DateTime.now(),
-    ),
-    DayClimate(
-      climate: Climate.sunny,
-      title: 'Sunny',
-      date: DateTime.now(),
-    ),
-    DayClimate(
-      climate: Climate.windy,
-      title: 'Windy',
-      date: DateTime.now(),
-    ),
-    DayClimate(
-      climate: Climate.dayrainy,
-      title: 'Rainy',
-      date: DateTime.now(),
-    ),
-  ];
+  DayWeather? dayWeather;
 
   @override
   void initState() {
@@ -361,7 +322,8 @@ class _ShowWeatherState extends State<ShowWeather> {
               ),
 
               VerticalCard(
-                dayclimates: dayclimates,
+                weathers: thisWeather?.list,
+                dayClimates: dayWeather?.dayClimates,
               ),
             ],
           ),

@@ -319,17 +319,17 @@ class Weather {
 }
 
 enum Description {
-  BROKEN_CLOUDS,
-  LIGHT_RAIN,
-  MODERATE_RAIN,
-  OVERCAST_CLOUDS
+  Sunny,
+  Rainy,
+  Storm,
+  Cloudy
 }
 
 final descriptionValues = EnumValues({
-  "broken clouds": Description.BROKEN_CLOUDS,
-  "light rain": Description.LIGHT_RAIN,
-  "moderate rain": Description.MODERATE_RAIN,
-  "overcast clouds": Description.OVERCAST_CLOUDS
+  "broken clouds": Description.Sunny,
+  "light rain": Description.Rainy,
+  "moderate rain": Description.Storm,
+  "overcast clouds": Description.Cloudy
 });
 
 enum Icon {
