@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_report/models/time_weather.dart';
 
+import '../models/day_weather.dart';
+
 class HorizontalCard extends StatelessWidget {
   final List<TimeWeather>? weathers;
+  final bool isCelsius;
 
   const HorizontalCard({
     super.key,
     required this.weathers,
+    required this.isCelsius,
   });
 
   @override
@@ -20,7 +24,7 @@ class HorizontalCard extends StatelessWidget {
             e.dateTime.month == now.month &&
             e.dateTime.day == now.day)
         .toList();
-    final nowAndNextTwentyFourHoursWeathers = todayWeathers != null
+    final List<TimeWeather>? nowAndNextTwentyFourHoursWeathers = todayWeathers != null
         ? todayWeathers.isNotEmpty
             ? todayWeathers
             : []
@@ -35,6 +39,12 @@ class HorizontalCard extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) {
               final item = nowAndNextTwentyFourHoursWeathers[index];
+              final tempCelsius = item.temperatureInCelsius.toString();
+              final tempFahrenheit = item.temperatureFahrenheit.toString();
+              final String displayedTemperature = isCelsius
+                  ? tempCelsius.toString()
+                  : tempFahrenheit.toString();
+              final imageAsset = climateImages[item.climate];
               final timeLabel = DateFormat('HH:mm').format(item.dateTime);
               return Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -46,9 +56,15 @@ class HorizontalCard extends StatelessWidget {
                   width: 110,
                   child: Column(
                     children: [
-                      // Image(image: ),
+                      imageAsset != null
+                          ? Image.asset(
+                        imageAsset,
+                        width: 75,
+                        height: 75,
+                      )
+                          : const SizedBox(),
                       Text(timeLabel),
-                      Text(item.temperatureInCelsius.toString()),
+                      Text('$displayedTemperature°'),
                     ],
                   ),
                 ),

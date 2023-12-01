@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import '../util/app_logger.dart';
+
 class ResponseForecastWeather {
   final String cod;
   final int message;
@@ -297,10 +299,10 @@ class Weather {
     final main = json["main"];
     final mainEnum = main != null ? mainEnumValues.map[main] : null;
     final description = json["description"];
-    final descriptions = main != null ? descriptionValues.map[description] : null;
+    logger.i(description);
+    final descriptions = description != null ? descriptionValues.map[description] : null; // TODO
     final icon = json["icon"];
-    final icons = main != null ? iconValues.map[icon] : null;
-
+    final icons = icon != null ? iconValues.map[icon] : null;
 
     return Weather(
     id: json["id"],
@@ -322,14 +324,18 @@ enum Description {
   Sunny,
   Rainy,
   Storm,
-  Cloudy
+  Cloudy,
+  Clear_Sky,
+  Few_Cloud,
 }
 
 final descriptionValues = EnumValues({
   "broken clouds": Description.Sunny,
   "light rain": Description.Rainy,
   "moderate rain": Description.Storm,
-  "overcast clouds": Description.Cloudy
+  "overcast clouds": Description.Cloudy,
+  "clear sky": Description.Clear_Sky,
+  "few clouds": Description.Few_Cloud,
 });
 
 enum Icon {

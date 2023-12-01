@@ -57,31 +57,34 @@ class _ShowWeatherState extends State<ShowWeather> {
   @override
   Widget build(BuildContext context) {
     final city = thisWeather?.city.toUpperCase();
-    final highTemp = dailyWeather?.highTempInCelsius;
+    final highTempInCelsius = dailyWeather?.highTempInCelsius;
+    final highTempInFahrenheit = dailyWeather?.highTemperatureFahrenheit;
     final String displayedHighTemp;
-    if (highTemp != null) {
+    if (dailyWeather != null) {
       displayedHighTemp = isCelsius
-          ? highTemp.toString()
-          : ((highTemp * 9 / 5) + 32).toStringAsFixed(0);
+          ? highTempInCelsius.toString()
+          : highTempInFahrenheit.toString();
     } else {
       displayedHighTemp = '??';
     }
-    final lowTemp = dailyWeather?.lowTempInCelsius;
+    final lowTempInCelsius = dailyWeather?.lowTempInCelsius;
+    final lowTempInFahrenheit = dailyWeather?.lowTemperatureFahrenheit;
     final String displayedLowTemp;
-    if (lowTemp != null) {
+    if (dailyWeather != null) {
       displayedLowTemp = isCelsius
-          ? lowTemp.toString()
-          : ((lowTemp * 9 / 5) + 32).toStringAsFixed(0);
+          ? lowTempInCelsius.toString()
+          : lowTempInFahrenheit.toString();
     } else {
       displayedLowTemp = '??';
     }
-    final nowTemperature = dailyWeather?.temperatureInCelsius;
+    final nowTempInCelsius = dailyWeather?.temperatureInCelsius;
+    final nowTempInFahrenheit = dailyWeather?.temperatureFahrenheit;
     final String displayedTemperature;
     final nowHumidity = dailyWeather?.humidity.toString();
-    if (nowTemperature != null) {
+    if (dailyWeather != null) {
       displayedTemperature = isCelsius
-          ? nowTemperature.toString()
-          : ((nowTemperature * 9 / 5) + 32).toStringAsFixed(0);
+          ? nowTempInCelsius.toString()
+          : nowTempInFahrenheit.toString();
     } else {
       displayedTemperature = '??';
     }
@@ -107,7 +110,10 @@ class _ShowWeatherState extends State<ShowWeather> {
                 height: 80,
               ),
               //Search City Bar
-              SearchBar(),
+              const SizedBox(
+                width: 380,
+                child: SearchBar(),
+              ),
 
               const SizedBox(
                 height: 16,
@@ -315,6 +321,7 @@ class _ShowWeatherState extends State<ShowWeather> {
 
               HorizontalCard(
                 weathers: thisWeather?.list,
+                isCelsius: isCelsius,
               ),
 
               const SizedBox(

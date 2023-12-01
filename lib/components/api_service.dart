@@ -6,6 +6,7 @@ import 'package:weather_report/models/daily_weather.dart';
 import 'package:weather_report/models/day_weather.dart';
 import 'package:weather_report/models/time_weather.dart';
 import 'package:weather_report/models/city_name.dart';
+import 'package:weather_report/util/app_logger.dart';
 
 class ApiService {
   final Dio dio = Dio();
@@ -39,19 +40,25 @@ class ApiService {
 
       final weather = ResponseWeather.fromJson(data);
 
-      final temperatureInFahrenheit = weather.main.temp;
-      final temperatureInCelsius = (temperatureInFahrenheit - 32) / 5 ~/ 9;
+      final temperatureInKelvin = weather.main.temp;
+      final temperatureInCelsius = temperatureInKelvin - 273.15;
+      final temperatureInFahrenheit = temperatureInCelsius * 9 / 5 + 32;
       final humidityNow = weather.main.humidity;
-      final highTempInFahrenheit = weather.main.tempMax;
-      final highTempInCelsius = (highTempInFahrenheit - 32) / 5 ~/ 9;
-      final lowTempInFahrenheit = weather.main.tempMin;
-      final lowTempInCelsius = (lowTempInFahrenheit - 32) / 5 ~/ 9;
+      final highTempInKelvin = weather.main.tempMax;
+      final highTempInCelsius = highTempInKelvin - 273.15;
+      final highTempInFahrenheit = highTempInCelsius * 9 / 5 + 32;
+      final lowTempInKelvin = weather.main.tempMin;
+      final lowTempInCelsius = lowTempInKelvin - 273.15;
+      final lowTempInFahrenheit = lowTempInCelsius * 9 / 5 + 32;
       return DailyWeather(
-        temperatureInCelsius: temperatureInCelsius,
+        temperatureInCelsius: temperatureInCelsius.toInt(),
+        temperatureFahrenheit: temperatureInFahrenheit.toInt(),
         dateTime: DateTime.now(),
         humidity: humidityNow,
-        highTempInCelsius: highTempInCelsius,
-        lowTempInCelsius: lowTempInCelsius,
+        highTempInCelsius: highTempInCelsius.toInt(),
+        highTemperatureFahrenheit: highTempInFahrenheit.toInt(),
+        lowTempInCelsius: lowTempInCelsius.toInt(),
+        lowTemperatureFahrenheit: lowTempInFahrenheit.toInt(),
       );
     } catch (error) {
       print('error = $error');
@@ -82,24 +89,34 @@ class ApiService {
 
       final forecastWeather = ResponseForecastWeather.fromJson(data);
       final list = forecastWeather.list.map((weather) {
-        final temperatureInFahrenheit = weather.main.temp;
-        final temperatureInCelsius = (temperatureInFahrenheit - 32) / 5 ~/ 9;
+        final temperatureInKelvin = weather.main.temp;
+        final temperatureInCelsius = temperatureInKelvin - 273.15;
+        final temperatureInFahrenheit = temperatureInCelsius * 9 / 5 + 32;
         final firstWeather = weather.weather.firstOrNull;
         final description = firstWeather?.description?.name;
 
+        logger.i("weather(${weather.dtTxt}) weather: ${weather.weather}, description: $description");
 
         final Climate? climates;
-        if(firstWeather?.main == null){
+        if(firstWeather?.description == Description.Clear_Sky){
           climates = Climate.sunny;
-        }else if(firstWeather?.main == MainEnum.CLOUDS){
+        }else if(firstWeather?.description == Description.Cloudy){
           climates = Climate.cloudy;
-        }else if(firstWeather?.main == MainEnum.RAIN){
+        }else if(firstWeather?.description == Description.Rainy){
           climates = Climate.dayRainy;
+        }else if(firstWeather?.description == Description.Storm){
+          climates = Climate.thunder;
+        }else if(firstWeather?.description == Description.Few_Cloud) {
+          climates = Climate.cloudy;
+        }else if(firstWeather?.description == Description.Sunny){
+          climates = Climate.sunny;
         }else{
           climates = null;
         }
+
         return TimeWeather(
-          temperatureInCelsius: temperatureInCelsius,
+          temperatureInCelsius: temperatureInCelsius.toInt(),
+          temperatureFahrenheit: temperatureInFahrenheit.toInt(),
           dateTime: weather.dtTxt,
           title: description,
           climate: climates,
