@@ -2,11 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:weather_report/components/cities.dart';
 import 'package:weather_report/components/response_forecast_weather.dart';
 import 'package:weather_report/components/response_weather.dart';
+import 'package:weather_report/components/weather_descriptions.dart';
 import 'package:weather_report/models/daily_weather.dart';
-import 'package:weather_report/models/day_weather.dart';
 import 'package:weather_report/models/time_weather.dart';
 import 'package:weather_report/models/city_name.dart';
-import 'package:weather_report/util/app_logger.dart';
+
+import '../models/climate.dart';
 
 class ApiService {
   final Dio dio = Dio();
@@ -50,6 +51,25 @@ class ApiService {
       final lowTempInKelvin = weather.main.tempMin;
       final lowTempInCelsius = lowTempInKelvin - 273.15;
       final lowTempInFahrenheit = lowTempInCelsius * 9 / 5 + 32;
+      final firstWeather = weather.weather.firstOrNull;
+      
+      final Climate? climates;
+      if (firstWeather?.description == Description.Clear_Sky) {
+        climates = Climate.sunny;
+      } else if (firstWeather?.description == Description.Cloudy) {
+        climates = Climate.cloudy;
+      } else if (firstWeather?.description == Description.Rainy) {
+        climates = Climate.dayRainy;
+      } else if (firstWeather?.description == Description.Storm) {
+        climates = Climate.thunder;
+      } else if (firstWeather?.description == Description.Few_Cloud) {
+        climates = Climate.cloudy;
+      } else if (firstWeather?.description == Description.Sunny) {
+        climates = Climate.sunny;
+      } else {
+        climates = Climate.unicorn;
+      }
+
       return DailyWeather(
         temperatureInCelsius: temperatureInCelsius.toInt(),
         temperatureFahrenheit: temperatureInFahrenheit.toInt(),
@@ -59,9 +79,9 @@ class ApiService {
         highTemperatureFahrenheit: highTempInFahrenheit.toInt(),
         lowTempInCelsius: lowTempInCelsius.toInt(),
         lowTemperatureFahrenheit: lowTempInFahrenheit.toInt(),
+        climate: climates,
       );
     } catch (error) {
-      print('error = $error');
       rethrow;
     }
   }
@@ -95,23 +115,22 @@ class ApiService {
         final firstWeather = weather.weather.firstOrNull;
         final description = firstWeather?.description?.name;
 
-        logger.i("weather(${weather.dtTxt}) weather: ${weather.weather}, description: $description");
 
         final Climate? climates;
-        if(firstWeather?.description == Description.Clear_Sky){
+        if (firstWeather?.description == Description.Clear_Sky) {
           climates = Climate.sunny;
-        }else if(firstWeather?.description == Description.Cloudy){
+        } else if (firstWeather?.description == Description.Cloudy) {
           climates = Climate.cloudy;
-        }else if(firstWeather?.description == Description.Rainy){
+        } else if (firstWeather?.description == Description.Rainy) {
           climates = Climate.dayRainy;
-        }else if(firstWeather?.description == Description.Storm){
+        } else if (firstWeather?.description == Description.Storm) {
           climates = Climate.thunder;
-        }else if(firstWeather?.description == Description.Few_Cloud) {
+        } else if (firstWeather?.description == Description.Few_Cloud) {
           climates = Climate.cloudy;
-        }else if(firstWeather?.description == Description.Sunny){
+        } else if (firstWeather?.description == Description.Sunny) {
           climates = Climate.sunny;
-        }else{
-          climates = null;
+        } else {
+          climates = Climate.unicorn;
         }
 
         return TimeWeather(
@@ -128,12 +147,11 @@ class ApiService {
         list: list,
       );
     } catch (error) {
-      print('error = $error');
       rethrow;
     }
   }
 
-  Future<CityName> getCities({required String q}) async {
+  Future<CityLocation> getCities({required String q}) async {
     try {
       final response = await dio.get(
         'http://api.openweathermap.org/geo/1.0/direct',
@@ -148,12 +166,15 @@ class ApiService {
           'appid': '8b06f7a92d32f24e637b47f97a25ca06',
         },
       );
-      var data = response.data;
-
-      final cities = Cities.fromJson(data);
-      return CityName(name: cities.name);
+      var data = response.data as List<dynamic>;
+      final first = data.first;
+      final cities = Cities.fromJson(first);
+      return CityLocation(
+        name: cities.name,
+        latitude: cities.lat,
+        longitude: cities.lon,
+      );
     } catch (error) {
-      print('error = $error');
       rethrow;
     }
   }

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-import '../util/app_logger.dart';
+import 'package:weather_report/components/weather_descriptions.dart';
+
+import 'enum_value.dart';
 
 class ResponseForecastWeather {
   final String cod;
@@ -299,8 +301,7 @@ class Weather {
     final main = json["main"];
     final mainEnum = main != null ? mainEnumValues.map[main] : null;
     final description = json["description"];
-    logger.i(description);
-    final descriptions = description != null ? descriptionValues.map[description] : null; // TODO
+    final descriptions = description != null ? descriptionValues.map[description] : null;
     final icon = json["icon"];
     final icons = icon != null ? iconValues.map[icon] : null;
 
@@ -320,23 +321,7 @@ class Weather {
   };
 }
 
-enum Description {
-  Sunny,
-  Rainy,
-  Storm,
-  Cloudy,
-  Clear_Sky,
-  Few_Cloud,
-}
 
-final descriptionValues = EnumValues({
-  "broken clouds": Description.Sunny,
-  "light rain": Description.Rainy,
-  "moderate rain": Description.Storm,
-  "overcast clouds": Description.Cloudy,
-  "clear sky": Description.Clear_Sky,
-  "few clouds": Description.Few_Cloud,
-});
 
 enum Icon {
   THE_04_D,
@@ -390,14 +375,4 @@ class Wind {
   };
 }
 
-class EnumValues<T> {
-  Map<String, T> map;
-  late Map<T, String> reverseMap;
 
-  EnumValues(this.map);
-
-  Map<T, String> get reverse {
-    reverseMap = map.map((k, v) => MapEntry(v, k));
-    return reverseMap;
-  }
-}

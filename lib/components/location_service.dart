@@ -7,8 +7,6 @@ class LocationService {
     final Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
-
-    print('position $position');
     return position;
   }
 }

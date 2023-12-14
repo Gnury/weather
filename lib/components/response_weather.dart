@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:weather_report/components/weather_descriptions.dart';
+
 class ResponseWeather {
     final Coord coord;
     final List<Weather> weather;
@@ -187,7 +189,7 @@ class Sys {
 class Weather {
     final int id;
     final String main;
-    final String description;
+    final Description? description;
     final String icon;
 
     Weather({
@@ -201,17 +203,22 @@ class Weather {
 
     String toRawJson() => json.encode(toJson());
 
-    factory Weather.fromJson(Map<String, dynamic> json) => Weather(
+    factory Weather.fromJson(Map<String, dynamic> json) {
+        final description = json["description"];
+        final descriptions = description != null ? descriptionValues.map[description] : null;
+
+      return Weather(
         id: json["id"],
         main: json["main"],
-        description: json["description"],
+        description: descriptions,
         icon: json["icon"],
     );
+    }
 
     Map<String, dynamic> toJson() => {
         "id": id,
         "main": main,
-        "description": description,
+        "description": descriptionValues.reverse[description],
         "icon": icon,
     };
 }
@@ -243,3 +250,4 @@ class Wind {
         "gust": gust,
     };
 }
+

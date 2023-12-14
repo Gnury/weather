@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_report/models/time_weather.dart';
 
-import '../models/day_weather.dart';
+import '../models/climate.dart';
 
 class HorizontalCard extends StatelessWidget {
   final List<TimeWeather>? weathers;
@@ -24,11 +24,12 @@ class HorizontalCard extends StatelessWidget {
             e.dateTime.month == now.month &&
             e.dateTime.day == now.day)
         .toList();
-    final List<TimeWeather>? nowAndNextTwentyFourHoursWeathers = todayWeathers != null
-        ? todayWeathers.isNotEmpty
-            ? todayWeathers
-            : []
-        : null;
+    final List<TimeWeather>? nowAndNextTwentyFourHoursWeathers =
+        todayWeathers != null
+            ? todayWeathers.isNotEmpty
+                ? todayWeathers
+                : []
+            : null;
 
     final content = nowAndNextTwentyFourHoursWeathers == null
         ? const Center(
@@ -58,11 +59,14 @@ class HorizontalCard extends StatelessWidget {
                     children: [
                       imageAsset != null
                           ? Image.asset(
-                        imageAsset,
-                        width: 75,
-                        height: 75,
-                      )
-                          : const SizedBox(),
+                              imageAsset,
+                              width: 75,
+                              height: 75,
+                            )
+                          : const SizedBox(
+                              width: 75,
+                              height: 75,
+                            ),
                       Text(timeLabel),
                       Text('$displayedTemperature°'),
                     ],

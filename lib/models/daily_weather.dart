@@ -1,3 +1,5 @@
+import 'climate.dart';
+
 class DailyWeather {
   final DateTime dateTime;
   final int temperatureInCelsius;
@@ -7,7 +9,7 @@ class DailyWeather {
   final int highTemperatureFahrenheit;
   final int lowTempInCelsius;
   final int lowTemperatureFahrenheit;
-
+  final Climate? climate;
 
   const DailyWeather({
     required this.temperatureInCelsius,
@@ -18,5 +20,6 @@ class DailyWeather {
     required this.highTemperatureFahrenheit,
     required this.lowTempInCelsius,
     required this.lowTemperatureFahrenheit,
+    required this.climate,
   });
 }

@@ -1,4 +1,5 @@
-import 'package:weather_report/models/day_weather.dart';
+
+import 'climate.dart';
 
 class ThisWeather {
   final List<TimeWeather> list;

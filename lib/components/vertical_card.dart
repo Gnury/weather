@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_report/models/day_weather.dart';
+import 'package:weather_report/models/day_climate.dart';
 
+import '../models/climate.dart';
 import '../models/time_weather.dart';
 
 class VerticalCard extends StatelessWidget {
@@ -81,6 +82,7 @@ class VerticalCard extends StatelessWidget {
             itemBuilder: (ctx, index) {
               final item = firstClimateOfTheDay![index];
               final imageAsset = climateImages[item.climate];
+              final titleClimate = item.title;
               final dateLabel = DateFormat('EEEE').format(item.date);
               return Card(
                 child: Padding(
@@ -108,10 +110,15 @@ class VerticalCard extends StatelessWidget {
                                   )
                                 : const SizedBox(),
                             const Spacer(),
-                            Text(
-                              item.title,
+                            // ignore: unnecessary_null_comparison
+                            titleClimate != null
+                            ? Text(
+                              titleClimate,
                               style: Theme.of(context).textTheme.titleLarge,
-                            ),
+                            )
+                            : Text(
+                              'No Climate Data',
+                              style: Theme.of(context).textTheme.titleLarge,),
                           ],
                         ),
                       ],
